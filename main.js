@@ -7,7 +7,7 @@ import {
 
 const html = htm.bind(h)
 
-const TRELLO_BOARD_ID = 'ovCkv6gD'
+const TRELLO_BOARD_ID = '2NQZ5FT4'
 const TRELLO_API_KEY = '3636549aec431f4cd7d45322147361ea'
 const TRELLO_API_TOKEN =
     'd32bfabca4972086af7b845f789a854ad6fe97e18684f17fd2b6890e21aa1bf8'
@@ -20,7 +20,14 @@ function App() {
     const [checked, changeChecked] = useState({})
 
     useEffect(() => {
-        fetch(`https://api.trello.com/1/boards/${TRELLO_BOARD_ID}/cards/open`)
+        const url = new URL(
+            `https://api.trello.com/1/boards/${TRELLO_BOARD_ID}/cards/open`
+        )
+
+        url.searchParams.set('token', TRELLO_API_TOKEN)
+        url.searchParams.set('key', TRELLO_API_KEY)
+
+        fetch(url)
             .then((res) => res.json())
             .then((res) => {
                 // console.log(res)
