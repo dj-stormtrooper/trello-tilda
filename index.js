@@ -5,6 +5,8 @@ import {
     useEffect,
 } from 'https://unpkg.com/preact@latest/hooks/dist/hooks.module.js?module'
 
+console.log('test')
+
 const html = htm.bind(h)
 
 const TRELLO_BOARD_ID = '2NQZ5FT4'
@@ -68,19 +70,19 @@ function App() {
             .catch((err) => console.log(err))
     }
 
-    return html`<div style="padding: 16px; font-family: Arial; width: 800px;">
-        <div style="display: flex;">
+    return html`<div class="trello__wrapper">
+        <div class="trello__header">
             <input
                 placeholder="Telegram login"
-                style="margin-bottom: 10px"
+                class="trello__telegram-input"
                 error=${loginError}
                 value=${login}
                 onInput=${(e) => onChangeLogin(e)}
             />
             ${Boolean(loginError) &&
-            html`<span style="color: red; margin-left: 16px;"
-                >${loginError}</span
-            >`}
+            html`<span class="trello__login-error">
+                ${loginError}
+                </span>`}
         </div>
         ${data.map(
             (item) =>
@@ -98,14 +100,14 @@ function Item({ data, checked, onClick }) {
 
     return html`
         <div
-            style="display: flex; justify-content: space-between; flex: 1; border: 1px solid grey; padding: 8px 16px; margin-bottom: 8px;"
+            class="trello__item"
         >
-            <div style="margin-right: 24px;">
+            <div class="trello__item-header">
                 <h3>${data.name}</h3>
                 <p>${data.desc}</p>
             </div>
             <button
-                style="height: 60px; min-width: 100px; display: block; flex: 0;"
+                class="trello__button"
                 onClick=${onClick}
             >
                 ${buttonText}

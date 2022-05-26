@@ -1,0 +1,38 @@
+.trello__wrapper {
+    padding: 16px;
+    font-family: Arial;
+    width: 800px;
+}
+
+.trello__header {
+    display: flex;
+}
+
+.trello__telegram-input {
+    margin-bottom: 10px;
+}
+
+.trello__login-error {
+    color: red;
+    margin-left: 16px;
+}
+
+.trello__item {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+    border: 1px solid grey;
+    padding: 8px 16px;
+    margin-bottom: 8px;
+}
+
+.trello__item-header {
+    margin-right: 24px;
+}
+
+.trello__button {
+    height: 60px;
+    min-width: 100px;
+    display: block;
+    flex: 0;
+}
