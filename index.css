@@ -17,6 +17,13 @@
     margin-left: 16px;
 }
 
+.trello__list-item-header {
+    border: 1px solid green;
+    padding: 8px 16px;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
 .trello__item {
     display: flex;
     justify-content: space-between;
