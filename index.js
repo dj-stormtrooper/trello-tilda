@@ -126,7 +126,7 @@ function ListItem({ data, onCardClick }) {
     }
 
     return html`
-        <div>
+        <div class="trello__list-item">
             <button class="trello__list-item-header" onClick=${ toggle }>
                 <h3>${data.name}</h3>
             </div>

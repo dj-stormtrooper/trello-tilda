@@ -1,7 +1,19 @@
 .trello__wrapper {
-    padding: 16px;
+    padding: 24px;
     font-family: 'GraphikTT',Arial,sans-serif;
     max-width: 600px;
+}
+
+.trello__wrapper h2 {
+    margin: 18px 0;
+}
+
+.trello__wrapper h3 {
+    margin: 16px 0;
+}
+
+.trello__wrapper p {
+    margin: 12px 0;
 }
 
 .trello__header {
@@ -17,12 +29,18 @@
     margin-left: 16px;
 }
 
+.trello__list-item {
+    display: flex;
+    flex-direction: column;
+}
+
 .trello__list-item-header {
     border: none;
     padding: 8px 16px;
     margin-bottom: 8px;
     cursor: pointer;
-    width: 100%;
+    flex: 1;
+    background-color: rgba(240, 240, 240);
 }
 
 .trello__item {
