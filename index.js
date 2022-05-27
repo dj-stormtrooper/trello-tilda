@@ -221,6 +221,8 @@ function Form({ cardId, onSubmit }) {
                 />
        
                 <button onClick=${ sendApplication } class="trello__submit-button">Отправить</button>
+                <button onClick=${ onSubmit } class="trello__submit-button trello__close-button">Закрыть</button>
+
                 ${ hasSuccess && html`<div class="trello__success-overlay">
                     <h2>Спасибо!</h2>
                     <button class="trello__button" onClick=${ onSubmit }>Закрыть</button>

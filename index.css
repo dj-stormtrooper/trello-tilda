@@ -2,6 +2,7 @@
     padding: 0 20px;
     font-family: 'GraphikTT',Arial,sans-serif;
     max-width: 600px;
+    margin: 0 auto;
 }
 
 .trello__wrapper h2 {
@@ -88,12 +89,15 @@
 .trello__form {
     position: absolute;
     top: 0;
-    left: 32px;
     right: 0;
     background: #fff;
     z-index: 100;
     box-shadow: 0 5px 20px 0 #0000001a;
     padding: 8px 24px 24px;
+    width: 320px;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .trello__telegram-input {
@@ -108,14 +112,18 @@
 .trello__submit-button {
     display: block;
     margin-top: 16px;
-    height: 40px;
+    min-height: 40px;
     border-radius: 8px;
-    width: 100%;
-
     background-color: #cce;
     font-weight: bold;
     border: none;
     cursor: pointer;
+    flex: 1;
+}
+
+.trello__close-button {
+    margin-top: 10px;
+    background-color: #ccc;
 }
 
 .trello__login-error {
