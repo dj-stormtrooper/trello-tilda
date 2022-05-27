@@ -12,6 +12,12 @@ const TRELLO_API_KEY = '3636549aec431f4cd7d45322147361ea'
 const TRELLO_API_TOKEN =
     'd32bfabca4972086af7b845f789a854ad6fe97e18684f17fd2b6890e21aa1bf8'
 const COMMENT_TEXT = 'Взял в работу: '
+const DISCLAIMER = html`
+<p>Друзья! В этом разделе мы собрали заявки от беженцев, которые пока не смогли выполнить сами. Вы можете выбрать любую заявку и помочь нам с её выполнением!</p>
+<p>Заявки сортированы по разделам, также мы выделили самое срочное.</p>
+<p>Если у вас нет возможности купить всё из списка, ничего страшного, любая помощь будет полезна!</p>
+<p>Вещи вы можете приносить нам по адресу <a href="https://goo.gl/maps/nouWtfnuBPorbfXD8" target="_blank">Палиашвили, 60</a>, либо просить у нас контакты человека, которому помощь предназначена и передавать лично.</p>
+<p>! Огромная просьба перед тем, как покупать что-то из списков, связаться с волонтёрами (Соня <a href="https://t.me/sofiagerich" target="_blank">@sofiagerich</a>, Сергей <a href="https://t.me/cielo_despejado" target="_blank">@cielo_despejado</a>, Наташа <a href="https://t.me/nataly_zvereva" target="_blank">@nataly_zvereva</a>) и уточнить актуальность!</p>`
 
 function makeRequest(urlString, options, method) {
     const url = new URL(urlString)
@@ -84,9 +90,6 @@ function App() {
             makeRequest(`https://api.trello.com/1/boards/${TRELLO_BOARD_ID}/lists`, { card_fields: 'all', cards: 'open' })
         ])
 
-        console.log(checklists)
-        console.log(lists)
-
         const preparedLists = prepareLists(lists, checklists );
             
         changeData(preparedLists)
@@ -97,6 +100,10 @@ function App() {
     }
 
     return html`<div class="trello__wrapper">
+        <h2>Помощь по запросу</h2>
+        <div class="trello__disclaimer">
+            ${ DISCLAIMER }
+        </div>
         <${Form } cardId=${cardId}/>
         ${data.map(
             (item) =>
@@ -119,9 +126,7 @@ function ListItem({ data, onCardClick }) {
     }
 
     return html`
-        <div
-            class="trello__list-item"
-        >
+        <div>
             <button class="trello__list-item-header" onClick=${ toggle }>
                 <h3>${data.name}</h3>
             </div>
@@ -130,15 +135,15 @@ function ListItem({ data, onCardClick }) {
                     class="trello__item"
                 >
                     <div class="trello__item-header">
-                        <h3>${card.name}</h3>
-                        ${ card.checklists.map(({ name }) => html`<p>${ name }</p>`)}
+                        <h4 class="trello__card-name">${card.name}</h4>
+                        <button
+                            class="trello__button"
+                            onClick=${() => onCardClick(card.id)}
+                        >
+                            Хочу помочь
+                        </button>
                     </div>
-                    <button
-                        class="trello__button"
-                        onClick=${() => onCardClick(card.id)}
-                    >
-                        Хочу помочь
-                    </button>
+                    ${ card.checklists.map(({ name }) => html`<p>${ name }</p>`)}
                 </div>
             `)}
         </div>
