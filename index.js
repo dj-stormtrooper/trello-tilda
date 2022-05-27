@@ -11,13 +11,14 @@ const TRELLO_BOARD_ID = 'psBDx0d8'
 const TRELLO_API_KEY = '3636549aec431f4cd7d45322147361ea'
 const TRELLO_API_TOKEN =
     'd32bfabca4972086af7b845f789a854ad6fe97e18684f17fd2b6890e21aa1bf8'
-const COMMENT_TEXT = 'Взял в работу: '
+const COMMENT_TEXT = 'Отклик с сайта\nКонтакты: '
+const ACCEPTED_LABEL_ID = "62911f1ae64f3f79c811d356";
 const DISCLAIMER = html`
 <p>Друзья! В этом разделе мы собрали заявки от беженцев, которые пока не смогли выполнить сами. Вы можете выбрать любую заявку и помочь нам с её выполнением!</p>
 <p>Заявки сортированы по разделам, также мы выделили самое срочное.</p>
 <p>Если у вас нет возможности купить всё из списка, ничего страшного, любая помощь будет полезна!</p>
-<p>Вещи вы можете приносить нам по адресу <a href="https://goo.gl/maps/nouWtfnuBPorbfXD8" target="_blank">Палиашвили, 60</a>, либо просить у нас контакты человека, которому помощь предназначена и передавать лично.</p>
-<p>! Огромная просьба перед тем, как покупать что-то из списков, связаться с волонтёрами (Соня <a href="https://t.me/sofiagerich" target="_blank">@sofiagerich</a>, Сергей <a href="https://t.me/cielo_despejado" target="_blank">@cielo_despejado</a>, Наташа <a href="https://t.me/nataly_zvereva" target="_blank">@nataly_zvereva</a>) и уточнить актуальность!</p>`
+<p>Вещи вы можете приносить нам по адресу <a href="https://goo.gl/maps/nouWtfnuBPorbfXD8" target="_blank">Палиашвили, 60</a> либо просить у нас контакты человека, которому помощь предназначена, и передавать лично.</p>
+<p>! Огромная просьба перед тем, как покупать что-то из списков, связаться с волонтёрами (Соня <a href="https://t.me/nomoresoft" target="_blank">@nomoresoft</a>, Сергей <a href="https://t.me/cielo_despejado" target="_blank">@cielo_despejado</a>, Наташа <a href="https://t.me/nataly_zvereva" target="_blank">@nataly_zvereva</a>) и уточнить актуальность!</p>`
 
 function makeRequest(urlString, options, method) {
     const url = new URL(urlString)
@@ -41,8 +42,9 @@ function makeRequest(urlString, options, method) {
 function isAcceptableCard(card) {
     const hasInternalSymbol = card.name.startsWith('!');
     const hasChecklists = card.idChecklists.length > 0;
+    const hasInternalLabel = Boolean(card.labels.find(({ id }) => id === ACCEPTED_LABEL_ID));
 
-    return !hasInternalSymbol && hasChecklists;
+    return !hasInternalSymbol && hasChecklists && !hasInternalLabel;
 }
 
 function prepareLists(lists, checklists) {
@@ -66,7 +68,7 @@ function prepareLists(lists, checklists) {
                             return !hasInternalSymbol && isInomplete;
                         });
 
-                    return { name: name.trim(), checklists: cardChecklists, } 
+                    return { id: card.id, name: name.trim(), checklists: cardChecklists, } 
                 })
                 .filter((card) => card.checklists.length > 0)
             
@@ -82,7 +84,6 @@ function prepareLists(lists, checklists) {
 
 function App() {
     const [data, changeData] = useState([])
-    const [cardId, changeCardId] = useState(null)
 
     useEffect(async () => {
         const [ checklists, lists ] = await Promise.all([
@@ -95,34 +96,33 @@ function App() {
         changeData(preparedLists)
     }, [])
 
-    const setCardId = (cardId) => () => {
-        changeCardId(cardId)
-    }
-
     return html`<div class="trello__wrapper">
         <h2>Помощь по запросу</h2>
         <div class="trello__disclaimer">
             ${ DISCLAIMER }
         </div>
-        <${Form } cardId=${cardId}/>
         ${data.map(
             (item) =>
-                html`<${ListItem}
-                    data=${item}
-                    onCardClick=${setCardId}
-                />`
+                html`<${ListItem} data=${item}/>`
         )}
 
     </div>`
 }
 
 
-function ListItem({ data, onCardClick }) {
+function ListItem({ data }) {
     const [ expanded, changeExpanded ]= useState(false);
     const { cards = [] } = data;
+    const [ limit, changeLimit ] = useState(10);
+
+    const restCount = Math.max(cards.length - limit, 0);
 
     const toggle = () => {
         changeExpanded(!expanded);
+    }
+
+    const increaseLimit = () => {
+        changeLimit(limit + 10)
     }
 
     return html`
@@ -130,33 +130,55 @@ function ListItem({ data, onCardClick }) {
             <button class="trello__list-item-header" onClick=${ toggle }>
                 <h3>${data.name}</h3>
             </div>
-            ${ expanded && cards.map((card) => html`
-                <div
-                    class="trello__item"
-                >
-                    <div class="trello__item-header">
-                        <h4 class="trello__card-name">${card.name}</h4>
-                        <button
-                            class="trello__button"
-                            onClick=${() => onCardClick(card.id)}
-                        >
-                            Хочу помочь
-                        </button>
-                    </div>
-                    ${ card.checklists.map(({ name }) => html`<p>${ name }</p>`)}
-                </div>
-            `)}
+            ${ expanded && cards.slice(0, limit).map((card) => html`<${ Card } card=${ card }/>`)}
+            ${ expanded && Boolean(restCount) && html`<p class="trello__show-more"><button class="trello__button-link" onClick=${ increaseLimit  }>
+                <b>Показать ещё ${ Math.min(restCount, 10) }</b>
+            </button></p>` }
         </div>
     `
 }
 
-function Form({ cardId }) {
-    const [login, changeLogin] = useState('')
-    const [loginError, changeLoginError] = useState('')
+function Card({ card }) {
+    const items = card.checklists;
 
-    if (!cardId) {
-        return null;
+    const [ isExpanded, changeExpanded ] = useState(items.length <= 5);
+    const itemsToRender = isExpanded ? items : items.slice(0, 5);
+
+    const [ isFormVisible, changeFormVisibility ] = useState(false);
+
+    const toggleForm = () => {
+        changeFormVisibility(!isFormVisible);
     }
+
+    const expand = () => {
+        changeExpanded(true);
+    }
+
+    return html`
+    <div
+        class="trello__item"
+    >
+        <div class="trello__item-header">
+            <h4 class="trello__card-name">${card.name}</h4>
+            <button
+                class="trello__button"
+                onClick=${ toggleForm }
+            >
+                Хочу помочь
+            </button>
+        </div>
+        ${ itemsToRender.map(({ name }) => html`<p>${ name }</p>`)}
+        ${ !isExpanded && html`<p><button onClick=${ expand } class="trello__button-link">Показать все</button></p>` }
+        ${ isFormVisible && html`<${ Form } cardId=${ card.id } onSubmit=${ toggleForm }/>` }
+    </div>
+`
+}
+
+function Form({ cardId, onSubmit }) {
+    const [login, changeLogin] = useState('')
+    const [comment, changeComment] = useState('')
+    const [loginError, changeLoginError] = useState('')
+    const [hasSuccess, changeSuccess] = useState(false)
 
     const sendApplication = () => {
         if (!login) {
@@ -164,34 +186,46 @@ function Form({ cardId }) {
             return
         }
 
-        makeRequest(
-            `https://api.trello.com/1/cards/${cardId}/actions/comments`,
-            { text: `${COMMENT_TEXT}${login}` },
-            'POST',
-        )
-            .catch((err) => console.log(err))
+        const text = `${COMMENT_TEXT}${login}${ comment ? `\nКомментарий: ${ comment }` : ''}`;
+        Promise.all([
+            makeRequest(`https://api.trello.com/1/cards/${cardId}/actions/comments`, { text }, 'POST'),
+            makeRequest(`https://api.trello.com/1/cards/${cardId}/idLabels`, { value: ACCEPTED_LABEL_ID }, 'POST'),
+        ]).then(() => changeSuccess(true))
     }
 
-    const onChangeLogin = (e) => {
+    const onChangeLogin = (value) => {
         changeLoginError('')
-        changeLogin(e.target.value)
+        changeLogin(value)
     }
 
     return html`
-        <div class="trello__header">
-            <input
-                placeholder="Telegram login"
-                class="trello__telegram-input"
-                error=${loginError}
-                value=${login}
-                onInput=${(e) => onChangeLogin(e)}
-            />
-            ${Boolean(loginError) &&
-            html`<span class="trello__login-error">
-                ${loginError}
-                </span>`}
-            <button onClick=${ sendApplication }>Отправить</button>
-    </div>
+        <div class="trello__form">
+            <h3>Оставьте контакты</h3>
+                <input
+                    placeholder="Telegram-логин или телефон"
+                    class="trello__telegram-input"
+                    error=${loginError}
+                    value=${login}
+                    onInput=${(e) => onChangeLogin(e.target.value)}
+                />
+                ${Boolean(loginError) &&
+                    html`<span class="trello__login-error">
+                        ${loginError}
+                        </span>`}
+
+                <input
+                    placeholder="Комментарий (необязательно)"
+                    class="trello__telegram-input"
+                    value=${comment}
+                    onInput=${(e) => changeComment(e.target.value)}
+                />
+       
+                <button onClick=${ sendApplication } class="trello__submit-button">Отправить</button>
+                ${ hasSuccess && html`<div class="trello__success-overlay">
+                    <h2>Спасибо!</h2>
+                    <button class="trello__button" onClick=${ onSubmit }>Закрыть</button>
+                </div>` }
+        </div>
     `
 }
 
