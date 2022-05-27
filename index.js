@@ -3,6 +3,7 @@ import htm from 'https://unpkg.com/htm?module'
 import {
     useState,
     useEffect,
+    useRef,
 } from 'https://unpkg.com/preact@latest/hooks/dist/hooks.module.js?module'
 
 const html = htm.bind(h)
@@ -169,16 +170,17 @@ function Card({ card }) {
         </div>
         ${ itemsToRender.map(({ name }) => html`<p>${ name }</p>`)}
         ${ !isExpanded && html`<p><button onClick=${ expand } class="trello__button-link">Показать все</button></p>` }
-        ${ isFormVisible && html`<${ Form } cardId=${ card.id } onSubmit=${ toggleForm }/>` }
+        ${ isFormVisible && html`<${ Form } cardId=${ card.id } onClose=${ toggleForm }/>` }
     </div>
 `
 }
 
-function Form({ cardId, onSubmit }) {
+function Form({ cardId, onClose }) {
     const [login, changeLogin] = useState('')
     const [comment, changeComment] = useState('')
     const [loginError, changeLoginError] = useState('')
     const [hasSuccess, changeSuccess] = useState(false)
+    const ref = useRef(null);
 
     const sendApplication = () => {
         if (!login) {
@@ -198,8 +200,20 @@ function Form({ cardId, onSubmit }) {
         changeLogin(value)
     }
 
+    useEffect(() => {
+        function handleClickOutside(event) {
+          if (ref.current && !ref.current.contains(event.target)) {
+            onClose()
+          }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }, [ref]);
+
     return html`
-        <div class="trello__form">
+        <div class="trello__form" ref=${ ref }>
             <h3>Оставьте контакты</h3>
                 <input
                     placeholder="Telegram-логин или телефон"
@@ -221,11 +235,11 @@ function Form({ cardId, onSubmit }) {
                 />
        
                 <button onClick=${ sendApplication } class="trello__submit-button">Отправить</button>
-                <button onClick=${ onSubmit } class="trello__submit-button trello__close-button">Закрыть</button>
+                <button onClick=${ onClose } class="trello__submit-button trello__close-button">Закрыть</button>
 
                 ${ hasSuccess && html`<div class="trello__success-overlay">
                     <h2>Спасибо!</h2>
-                    <button class="trello__button" onClick=${ onSubmit }>Закрыть</button>
+                    <button class="trello__button" onClick=${ onClose }>Закрыть</button>
                 </div>` }
         </div>
     `
