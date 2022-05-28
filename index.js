@@ -246,4 +246,4 @@ function Form({ cardId, onClose }) {
     `
 }
 
-render(html`<${App} />`, document.body)
+render(html`<${App} />`, document.getElementById('trello-app'))
