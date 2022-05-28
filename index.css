@@ -2,7 +2,7 @@
     padding: 0 20px;
     font-family: 'GraphikTT',Arial,sans-serif;
     max-width: 600px;
-    margin: 48px auto;
+    margin: 24px auto 48px;
 }
 
 .trello__wrapper h2 {
@@ -15,11 +15,6 @@
 
 .trello__wrapper p {
     margin: 12px 0;
-}
-
-.trello__header {
-    text-align: center;
-    font-size: 26px;
 }
 
 .trello__list-item {

@@ -99,7 +99,6 @@ function App() {
     }, [])
 
     return html`<div class="trello__wrapper">
-        <h2 class="trello__header">Помощь по запросу</h2>
         <div class="trello__disclaimer">
             ${ DISCLAIMER }
         </div>
@@ -107,7 +106,6 @@ function App() {
             (item) =>
                 html`<${ListItem} data=${item}/>`
         )}
-
     </div>`
 }
 
