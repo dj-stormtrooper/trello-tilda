@@ -8,11 +8,11 @@ import {
 
 const html = htm.bind(h)
 
-const TRELLO_BOARD_ID = 'psBDx0d8'
-const TRELLO_API_KEY = '3636549aec431f4cd7d45322147361ea'
+const TRELLO_BOARD_ID = '0YsY6PiB'
+const TRELLO_API_KEY = '16d4f7a4a889340fdcba49ef23b09a40'
 const TRELLO_API_TOKEN =
-    'd32bfabca4972086af7b845f789a854ad6fe97e18684f17fd2b6890e21aa1bf8'
-const ACCEPTED_LABEL_ID = "62911f1ae64f3f79c811d356";
+    '039eb7df60f08dbf963ef5a951dec85b139cd89e23e2ade071227085bee2d6fb'
+const ACCEPTED_LABEL_ID = "6292386c1978512a2fed7db8";
 
 const COMMENT_TEXT = 'Отклик с сайта\nКонтакты: '
 const DISCLAIMER = html`
@@ -99,7 +99,7 @@ function App() {
     }, [])
 
     return html`<div class="trello__wrapper">
-        <h2>Помощь по запросу</h2>
+        <h2 class="trello__header">Помощь по запросу</h2>
         <div class="trello__disclaimer">
             ${ DISCLAIMER }
         </div>

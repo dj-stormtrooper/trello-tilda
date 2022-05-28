@@ -17,6 +17,10 @@
     margin: 12px 0;
 }
 
+.trello__header {
+    text-align: center;
+}
+
 .trello__list-item {
     display: flex;
     flex-direction: column;
