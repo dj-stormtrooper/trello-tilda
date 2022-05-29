@@ -20,7 +20,7 @@ const DISCLAIMER = html`
 <p>Заявки сортированы по разделам, также мы выделили самое срочное.</p>
 <p>Если у вас нет возможности купить всё из списка, ничего страшного, любая помощь будет полезна!</p>
 <p>Вещи вы можете приносить нам по адресу <a href="https://goo.gl/maps/nouWtfnuBPorbfXD8" target="_blank">Палиашвили, 60</a> либо просить у нас контакты человека, которому помощь предназначена, и передавать лично.</p>
-<p>! Огромная просьба перед тем, как покупать что-то из списков, оставить свои контакты в форме обратной связи и дождаться отклика. Или связаться с волонтёрами (Соня <a href="https://t.me/nomoresoft" target="_blank">@nomoresoft</a>, Сергей <a href="https://t.me/cielo_despejado" target="_blank">@cielo_despejado</a>, Наташа <a href="https://t.me/nataly_zvereva" target="_blank">@nataly_zvereva</a>) и уточнить актуальность</p>`
+<p>! Огромная просьба перед тем, как покупать что-то из списков, оставить свои контакты в форме обратной связи и дождаться отклика. Или связаться с волонтёрами (Соня <a href="https://t.me/nomoresoft" target="_blank">@nomoresoft</a>, Сергей <a href="https://t.me/cielo_despejado" target="_blank">@cielo_despejado</a>, Наташа <a href="https://t.me/nataly_zvereva" target="_blank">@nataly_zvereva</a>) и уточнить актуальность!</p>`
 
 function makeRequest(urlString, options, method) {
     const url = new URL(urlString)
@@ -145,9 +145,18 @@ function Card({ card }) {
     const itemsToRender = isExpanded ? items : items.slice(0, 5);
 
     const [ isFormVisible, changeFormVisibility ] = useState(false);
+    const [ isCardVisible, changeCardVisibility ] = useState(true);
 
-    const toggleForm = () => {
-        changeFormVisibility(!isFormVisible);
+    if (!isCardVisible) {
+        return null;
+    }
+
+    const onClose = (submited) => {
+        changeFormVisibility(false);
+
+        if (submited) {
+            changeCardVisibility(false)
+        }
     }
 
     const expand = () => {
@@ -162,14 +171,14 @@ function Card({ card }) {
             <h4 class="trello__card-name">${card.name}</h4>
             <button
                 class="trello__button"
-                onClick=${ toggleForm }
+                onClick=${ () => changeFormVisibility(true) }
             >
                 Хочу помочь
             </button>
         </div>
         ${ itemsToRender.map(({ name }) => html`<p>${ name }</p>`)}
         ${ !isExpanded && html`<p><button onClick=${ expand } class="trello__button-link">Показать все</button></p>` }
-        ${ isFormVisible && html`<${ Form } cardId=${ card.id } onClose=${ toggleForm }/>` }
+        ${ isFormVisible && html`<${ Form } cardId=${ card.id } onClose=${ onClose }/>` }
     </div>
 `
 }
@@ -183,15 +192,14 @@ function Form({ cardId, onClose }) {
 
     const sendApplication = () => {
         if (!login) {
-            changeLoginError('Введите логин')
+            changeLoginError('Введите контакты')
             return
         }
 
         const text = `${COMMENT_TEXT}${login}${ comment ? `\nКомментарий: ${ comment }` : ''}`;
-        Promise.all([
-            makeRequest(`https://api.trello.com/1/cards/${cardId}/actions/comments`, { text }, 'POST'),
-            makeRequest(`https://api.trello.com/1/cards/${cardId}/idLabels`, { value: ACCEPTED_LABEL_ID }, 'POST'),
-        ]).then(() => changeSuccess(true))
+        makeRequest(`https://api.trello.com/1/cards/${cardId}/actions/comments`, { text }, 'POST')
+            .then(() => makeRequest(`https://api.trello.com/1/cards/${cardId}/idLabels`, { value: ACCEPTED_LABEL_ID }, 'POST'))
+            .then(() => changeSuccess(true))
     }
 
     const onChangeLogin = (value) => {
@@ -220,6 +228,7 @@ function Form({ cardId, onClose }) {
                     error=${loginError}
                     value=${login}
                     onInput=${(e) => onChangeLogin(e.target.value)}
+                    maxlength="50"
                 />
                 ${Boolean(loginError) &&
                     html`<span class="trello__login-error">
@@ -231,6 +240,7 @@ function Form({ cardId, onClose }) {
                     class="trello__telegram-input"
                     value=${comment}
                     onInput=${(e) => changeComment(e.target.value)}
+                    maxlength="500"
                 />
        
                 <button onClick=${ sendApplication } class="trello__submit-button">Отправить</button>
@@ -238,7 +248,7 @@ function Form({ cardId, onClose }) {
 
                 ${ hasSuccess && html`<div class="trello__success-overlay">
                     <h2>Спасибо!</h2>
-                    <button class="trello__button" onClick=${ onClose }>Закрыть</button>
+                    <button class="trello__button" onClick=${ () => onClose(true) }>Закрыть</button>
                 </div>` }
         </div>
     `
