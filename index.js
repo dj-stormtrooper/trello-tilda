@@ -15,12 +15,6 @@ const TRELLO_API_TOKEN =
 const ACCEPTED_LABEL_ID = "6292386c1978512a2fed7db8";
 
 const COMMENT_TEXT = 'Отклик с сайта\nКонтакты: '
-const DISCLAIMER = html`
-<p>Друзья! В этом разделе мы собрали заявки от беженцев, которые пока не смогли выполнить сами. Вы можете выбрать любую заявку и помочь нам с её выполнением!</p>
-<p>Заявки сортированы по разделам, также мы выделили самое срочное.</p>
-<p>Если у вас нет возможности купить всё из списка, ничего страшного, любая помощь будет полезна!</p>
-<p>Вещи вы можете приносить нам по адресу <a href="https://goo.gl/maps/nouWtfnuBPorbfXD8" target="_blank">Палиашвили, 60</a> либо просить у нас контакты человека, которому помощь предназначена, и передавать лично.</p>
-<p>! Огромная просьба перед тем, как покупать что-то из списков, оставить свои контакты в форме обратной связи и дождаться отклика. Или связаться с волонтёрами (Соня <a href="https://t.me/nomoresoft" target="_blank">@nomoresoft</a>, Сергей <a href="https://t.me/cielo_despejado" target="_blank">@cielo_despejado</a>, Наташа <a href="https://t.me/nataly_zvereva" target="_blank">@nataly_zvereva</a>) и уточнить актуальность!</p>`
 
 function makeRequest(urlString, options, method) {
     const url = new URL(urlString)
@@ -99,9 +93,6 @@ function App() {
     }, [])
 
     return html`<div class="trello__wrapper">
-        <div class="trello__disclaimer">
-            ${ DISCLAIMER }
-        </div>
         ${data.map(
             (item) =>
                 html`<${ListItem} data=${item}/>`

@@ -73,18 +73,6 @@
     border-bottom: 1px solid #ccc;
 }
 
-.trello__disclaimer {
-    margin-bottom: 24px;
-}
-
-.trello__discalimer a:hover, a:visited, a:link, a:active {
-    text-decoration: none;
-}
-
-.trello__disclaimer a {
-    color: #0c78ed;
-}
-
 .trello__form {
     position: absolute;
     top: 0;
